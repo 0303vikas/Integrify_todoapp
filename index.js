@@ -4,9 +4,18 @@ const newToDO = document.getElementById('add-btn')
 newToDO.addEventListener('click', createForm)
 
 function createForm() { 
-    if(document.getElementById('form') != undefined) return
 
     let displayArea = document.getElementById('display-area')
+
+    //check if edit form is open and empty the space
+    if(document.getElementById('edit-btn') != undefined) {
+        displayArea.innerHTML = ''
+    }
+
+    //check if add new form is open 
+    if(document.getElementById('form') != undefined) return
+
+    
     if(displayArea) {
         displayArea.innerHTML = ''
     }   
@@ -60,7 +69,16 @@ function createForm() {
     submitBtn.innerHTML = 'Confirm'
     form.appendChild(submitBtn)
 
-    submitBtn.addEventListener('click', saveNote)   
+    submitBtn.addEventListener('click', saveNote)  
+    
+    let cancelBtn = document.createElement('button')
+    cancelBtn.setAttribute('type','button')
+    cancelBtn.setAttribute('id','cancel-btn')
+    cancelBtn.setAttribute('value', 'Cancel')
+    cancelBtn.innerHTML = 'Cancel'
+    form.appendChild(cancelBtn)
+
+    cancelBtn.addEventListener('click', cancelEdit)
 
 }
 
@@ -80,12 +98,10 @@ function saveNote() {
         list: list,
     }
 
-    itemList.push(item)
+    itemList.push(item)    
     
-    updateCounter(item.id)
     deleteForm()
-
-    
+    updateCounter(item.id)    
     displayTask()
 } 
 
@@ -99,9 +115,6 @@ function deleteForm() {
     if(document.getElementById('form') == undefined) return
     document.getElementById('form').remove()
 }
-
-
-
 
 // adding tasks 
 
@@ -156,14 +169,15 @@ function editForm(id) {
     Input1.setAttribute('type', 'text')
     Input1.setAttribute('name', 'title')
     Input1.setAttribute('id', 'title')
-    Input1.value = `${itemList[id].title}`
+    Input1.setAttribute('value',`${itemList[id].title}`)
     Input1.setAttribute('required', 'true')
     form.appendChild(Input1)    
 
     let Input2 = document.createElement('input')
     Input2.setAttribute('type', 'date')
     Input2.setAttribute('name', 'date')
-    Input2.value= `${itemList[id].date}`
+    Input2.setAttribute('id', 'date')
+    Input2.setAttribute('value', `${itemList[id].date}`)
     Input2.setAttribute('placeholder', 'dd.mm.yyyy')
     Input2.setAttribute('required', 'true')
     form.appendChild(Input2)
@@ -171,9 +185,10 @@ function editForm(id) {
     let Input3 = document.createElement('select')
     Input3.setAttribute('name', 'list')
     Input3.setAttribute('id', 'list')
-    Input3.innerText= `${itemList[id].list}`
+    Input3.setAttribute('value', `${itemList[id].list}`)
     Input3.setAttribute('required', 'true')
-    form.appendChild(Input3)   
+    form.appendChild(Input3)
+    
 
     let Input3Option1 = document.createElement('option')
     Input3Option1.setAttribute('value', 'Not Started')
@@ -197,24 +212,55 @@ function editForm(id) {
     editBtn.innerHTML = 'Edit'
     form.appendChild(editBtn)
 
-    editBtn.addEventListener('click', function (){
+    editBtn.addEventListener('click', function () {editTask(id)})
 
-        let title = document.getElementById('title').value
-        let duplicateValue = checkDuplicateTitle(title)
-        if(duplicateValue) return
+    let deleteBtn = document.createElement('button')
+    deleteBtn.setAttribute('type','button')
+    deleteBtn.setAttribute('id','delete-btn')
+    deleteBtn.setAttribute('value', 'Delete')
+    deleteBtn.innerHTML = 'Delete'
+    form.appendChild(deleteBtn)
 
-        let date = document.getElementById('date').value
-        let list = document.getElementById('list').value
+    deleteBtn.addEventListener('click', function () {deleteTask(id)})
 
-        itemList[id].title = title
-        itemList[id].date = date
-        itemList[id].list = list 
+    let cancelBtn = document.createElement('button')
+    cancelBtn.setAttribute('type','button')
+    cancelBtn.setAttribute('id','cancel-btn')
+    cancelBtn.setAttribute('value', 'Cancel')
+    cancelBtn.innerHTML = 'Cancel'
+    form.appendChild(cancelBtn)
 
-        deleteForm()
-        displayTask()
-    })
+    cancelBtn.addEventListener('click', cancelEdit)
+}
 
+function editTask(id){
 
+    let title = document.getElementById('title').value
+    let date = document.getElementById('date').value
+    let list = document.getElementById('list').value
+
+    console.log(title, date,list)
+
+    itemList[id].title = title
+    itemList[id].date = date
+    itemList[id].list = list 
+
+    deleteForm()
+    displayTask()
+
+}
+
+function deleteTask(id) {
+    delete itemList[id]
+
+    deleteForm()
+    displayTask()
+    updateCounter(itemList.length-1)
+}
+
+function cancelEdit() {
+    deleteForm()
+    displayTask()
 
 }
 
@@ -240,11 +286,4 @@ function clearTasks() {
     updateCounter(0)
 
 }
-
-
-
-
-
-
-
 
